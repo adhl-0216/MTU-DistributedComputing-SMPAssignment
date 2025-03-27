@@ -28,19 +28,27 @@ public class SMPAppServer extends SMPServerWrapper {
         String message = user + ": " + new String(payload);
         messages.add(message);
         System.out.println("Message received: " + message);
+        System.out.println("Current messages:");
+        for (int i = 0; i < messages.size(); i++) {
+            System.out.println(i + ": " + messages.get(i));
+        }
     }
 
     @Override
     protected void handleDownloadAll(Socket client) {
         try {
-            for (String msg : messages) {
-                sendMessage(client, (byte) 0x10, msg.getBytes());
+            if (messages.isEmpty()) {
+                sendError(client, "No messages available.");
+                return;
             }
-            sendMessage(client, (byte) 0x11, new byte[0]); // End marker
+            String allMessages = String.join("\n", messages);
+            System.out.println("Downloading all messages:\n" + allMessages); // Debug output
+            sendMessage(client, (byte) 0x10, allMessages.getBytes());
         } catch (IOException e) {
             sendError(client, "Failed to send messages.");
         }
     }
+    
 
     @Override
     protected void handleDownloadOne(Socket client, byte[] payload) {
@@ -50,6 +58,7 @@ public class SMPAppServer extends SMPServerWrapper {
                 sendError(client, "Invalid message index.");
                 return;
             }
+            System.out.println("Downloading message at index " + index + ": " + messages.get(index)); // Debug output
             sendMessage(client, (byte) 0x10, messages.get(index).getBytes());
         } catch (IOException e) {
             sendError(client, "Failed to retrieve message.");
