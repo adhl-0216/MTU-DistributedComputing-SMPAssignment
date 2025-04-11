@@ -5,12 +5,10 @@ import java.io.*;
 public class SMPServerThread implements Runnable {
     private final SMPStreamSocket socket;
     private final SMPCommandHandler handler;
-    // private final SessionManager sessionManager;
 
     public SMPServerThread(SMPStreamSocket socket, SMPCommandHandler handler, SMPSessionManager sessionManager) {
         this.socket = socket;
         this.handler = handler;
-        // this.sessionManager = sessionManager;
     }
 
     @Override
@@ -19,7 +17,6 @@ public class SMPServerThread implements Runnable {
             boolean active = true;
             while (active) {
                 DataInputStream input = new DataInputStream(socket.getInputStream());
-                // DataOutputStream output = new DataOutputStream(socket.getOutputStream());
 
                 byte command = input.readByte();
                 byte length = input.readByte();
